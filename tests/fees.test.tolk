@@ -515,20 +515,4 @@ get fun `test transfer budgets`() {
 
         variantIndex += 1;
     }
-
-    // A future ConfigParam 45 change can remove the discount. Measure the same
-    // library code with ordinary TVM charging instead of assuming 1000 gas.
-    var ordinaryConfig = config;
-    ordinaryConfig.setPrecompiledContractsConfig({ list: [] });
-
-    expect(testing.setConfig(ordinaryConfig)).toBeTrue();
-
-    val stablecoinTvm = Variant {
-        name: "StablecoinWalletTvm",
-        kind: WalletLayout.StatusPrefix,
-        library: true,
-    };
-
-    measure(stablecoinTvm, false, 1, 0, grams("0.01"));
-    measure(stablecoinTvm, true, 1, 0, grams("0.01"));
 }

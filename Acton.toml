@@ -21,9 +21,6 @@ src = "contracts/m103.boc"
 [contracts.m105]
 src = "contracts/m105.boc"
 
-[contracts.StablecoinWalletTvm]
-src = "contracts/StablecoinWallet.boc"
-
 [fmt]
 width = 100
 

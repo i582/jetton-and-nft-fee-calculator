@@ -31,13 +31,9 @@ describe("agreement with complete Acton traces", () => {
   test("funding formulas and margin match every recorded scenario", () => {
     const calculated = rows.map(row => {
       const profile = profiles[row.variant];
-      const prices = row.variant === "StablecoinWalletTvm"
-        ? { ...config, precompiled: new Map<string, bigint>() }
-        : config;
-
       const minimum = minimumAttachment(
         profile,
-        prices,
+        config,
         BigInt(row.incomingForwardFee),
         BigInt(row.forward),
         row.deployedCodeHash,

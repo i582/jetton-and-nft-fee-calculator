@@ -228,7 +228,6 @@ export const profiles: Record<string, WalletProfile> = {
   m105: legacy(10_000_000n, true),
   minter: legacy(10_000_000n, true),
   StablecoinWallet: modern(9255n, 10355n),
-  StablecoinWalletTvm: modern(9255n, 10355n),
   JettonNotcoinWallet: modern(10065n, 10435n),
   Jetton2Wallet: modern(9115n, 10288n, 1026n, 812n),
   JettonWallet: modern(6327n, 7443n, 1026n, 812n),

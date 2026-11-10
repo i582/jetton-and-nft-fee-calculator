@@ -48,18 +48,13 @@ for (const line of log.split("\n")) {
   const profile = profiles[variant];
   if (!profile) throw new Error(`Missing fee profile for ${variant}`);
 
-  const fileName = variant === "StablecoinWalletTvm" ? "StablecoinWallet" : variant;
-  const code = Cell.fromBoc(await readFile(join(root, "contracts", `${fileName}.boc`)))[0];
+  const code = Cell.fromBoc(await readFile(join(root, "contracts", `${variant}.boc`)))[0];
   const usesLibrary = profile.family === "modern" && variant !== "JettonWallet";
   const deployedCode = usesLibrary
     ? beginCell().storeUint(2, 8).storeBuffer(code.hash()).endCell({ exotic: true })
     : code;
 
-  const scenarioConfig = variant === "StablecoinWalletTvm"
-    ? { ...config, precompiled: new Map<string, bigint>() }
-    : config;
-
-  const guard = minimumAttachment(profile, scenarioConfig, BigInt(incomingFee), BigInt(forward), deployedCode.hash().toString("hex"));
+  const guard = minimumAttachment(profile, config, BigInt(incomingFee), BigInt(forward), deployedCode.hash().toString("hex"));
   if (guard !== BigInt(minimum)) {
     throw new Error(`${variant}: Acton minimum ${minimum} differs from analytic guard ${guard}`);
   }
@@ -91,7 +86,7 @@ for (const line of log.split("\n")) {
   });
 }
 
-if (measurements.length !== 77 || !log.includes("1 passed")) {
+if (measurements.length !== 75 || !log.includes("1 passed")) {
   throw new Error(`Incomplete Acton run: found ${measurements.length} scenarios; see results/acton.log`);
 }
 

@@ -3,6 +3,8 @@
 This study measures the smallest attachment that completes an ordinary jetton transfer.
 Acton executes original wallet bytecode. A TypeScript calculator reproduces each contract's funding check.
 
+Modern wallet BoCs and ABI interfaces come from the public [TON ABI catalog](https://github.com/ton-blockchain/abis/tree/7dc57067d85c95dc25c09ccaaf108eaba62f6303/data/jettons).
+
 The [generated report](RESULTS.md) contains the measured amounts.
 The [complete measurements](results/measurements.json) include code hashes, gas usage, retained balances, excesses, and failure diagnostics.
 One GRAM equals 1,000,000,000 nanograms. All calculations use integers.
@@ -12,7 +14,8 @@ One GRAM equals 1,000,000,000 nanograms. All calculations use integers.
 Requirements: Bun and Acton 1.2.0 in `PATH`. The recorded baseline uses Acton `1.2.0 (16d49e1)`.
 
 ```bash
-cd research/jetton-transfer-fees
+git clone https://github.com/i582/jetton-fee-calculator.git
+cd jetton-fee-calculator
 bun install --frozen-lockfile
 bun start
 ```
@@ -32,6 +35,7 @@ bun run report
 ```
 
 `compile:func` rebuilds historical FunC wallets with project dependencies and checks their code hashes.
+It uses FunC 0.4.6 through the pinned `func-js` dependency.
 It requires no `NODE_PATH`. TypeScript scripts run directly through Bun.
 
 ## Main finding
@@ -41,7 +45,6 @@ Modern wallets price gas and storage from network configuration. Older wallets e
 
 At mainnet block 104490013 (2026-11-10), an empty USDT transfer needs **0.001426106 GRAM** with the precompiled contract enabled.
 The proposed attachment is **0.0016 GRAM**, after successful emulation.
-The same code without the precompiled discount needs **0.002600105 GRAM**.
 
 Jetton 1.2 needs **0.002659439 GRAM**. Jetton 2.0 needs **0.002578373 GRAM**.
 Jetton 1.07 still requires **0.040236272 GRAM** because of its fixed funding check.
@@ -97,7 +100,6 @@ Wallet code hashes, rather than marketing names or getter interfaces, identify t
 | 1.03M and 1.04M | `m103` | Same transfer implementation; minter discovery changes separately |
 | 1.05M | `m105`, `minter` | Release source and later upstream revision |
 | Stablecoin 1.04 / USDT | `StablecoinWallet` | Library deployment with the block's ConfigParam 45 entry |
-| Stablecoin without precompilation | `StablecoinWalletTvm` | Same code and prices, with ConfigParam 45 cleared |
 | Jetton 1.2 / NOT | `JettonNotcoinWallet` | Library deployment |
 | Jetton 2.0 | `Jetton2Wallet` | Library deployment, eight-bit owner shard prefix |
 | Acton Tolk 2.1 | `JettonWallet` | Additional catalog fixture, full-code deployment |
@@ -128,8 +130,7 @@ Each implementation has five scenarios:
 - A new recipient wallet with a 32-byte ASCII comment in a referenced cell.
 - A new recipient wallet with zero pre-existing GRAM at the sender's jetton-wallet.
 
-Two additional scenarios disable precompilation for the stablecoin wallet.
-This gives 77 scenarios in total.
+This gives 75 scenarios on the recorded mainnet configuration.
 
 Each binary-search probe restores a complete world snapshot.
 A failed probe cannot fund a later probe or leave a recipient deployed.
@@ -202,6 +203,8 @@ The user must have the attachment plus the ordinary wallet's own execution and f
 
 ## Refresh inputs
 
+The revisions are recorded in [sources.json](fixtures/sources.json).
+
 To download the same pinned upstream sources:
 
 ```bash
@@ -219,34 +222,3 @@ bun start
 A changed result fails the snapshot comparison.
 After review, accept the new baseline with `bun start --update`.
 The update flag changes `fixtures/expected-results.json` explicitly.
-
-## Files and sources
-
-| Path | Purpose |
-|---|---|
-| `tests/fees.test.tolk` | Acton scenarios, snapshot restoration, and boundary search |
-| `contracts/Relay.tolk` | Owner relay that supplies authentic forwarding fees |
-| `contracts/*.boc` | Original wallet bytecode |
-| `contracts/*.types.tolk` | ABI interfaces for modern precompiled BoCs |
-| `calculator.ts` | Integer funding formulas and proposed margin |
-| `tools/*.ts` | Source download, historical compilation, execution, and report generation |
-| `fixtures/` | Configuration, source revisions, provenance, and expected measurements |
-| `vendor/` | Pinned upstream FunC sources and their license files |
-| `results/` | Latest measurements and local diagnostic logs |
-
-Historical wallets compile with FunC 0.4.6 through the pinned `func-js` dependency.
-The resulting code hashes match the recorded catalog variants where those variants exist.
-Modern BoCs and ABI interfaces came from the local `~/abis` catalog.
-The study includes those files, so another machine does not need that directory.
-
-Upstream sources retain their original comments and terminology. Their license files apply to those sources.
-The pinned revisions are recorded in [sources.json](fixtures/sources.json).
-
-Primary references:
-
-- [Jetton version history](https://github.com/ton-blockchain/jetton-contract/blob/jetton-2.0/VERSION_HISTORY.md)
-- [Stablecoin gas checks](https://github.com/ton-blockchain/stablecoin-contract/blob/main/contracts/gas.fc)
-- [Jetton 1.2 gas checks](https://github.com/ton-blockchain/jetton-contract/blob/main/contracts/gas.fc)
-- [TON precompiled contracts](https://docs.ton.org/foundations/precompiled)
-- [TEP-74](https://github.com/ton-blockchain/TEPs/blob/master/text/0074-jettons-standard.md)
-- [Acton precompiled BoC workflow](https://ton-blockchain.github.io/acton/docs/building/precompiled-boc)

@@ -23,7 +23,6 @@ The request sets forward_ton_amount to 1 nanogram and response_destination to th
 | JettonNotcoinWallet | 0.002659439 | 0.002800000 | 0.001618138 | 0.000974433 | 0.000066867 |
 | Jetton2Wallet | 0.002578373 | 0.002800000 | 0.001577071 | 0.001001301 | 0.000000000 |
 | JettonWallet | 0.002202839 | 0.002400000 | 0.001600271 | 0.000602567 | 0.000000000 |
-| StablecoinWalletTvm | 0.002600105 | 0.002800000 | 0.001576137 | 0.001023967 | 0.000000000 |
 
 Costs, retained balances, and excesses correspond to the **minimum attachment**.
 They do not represent the suggested attachment.
@@ -32,7 +31,7 @@ The network cost excludes the source owner's transaction and execution of notifi
 The suggested attachment adds max(0.0001 GRAM, 5% of the variable budget), then rounds upward to 0.0001 GRAM.
 This margin is a proposed wallet policy after successful emulation. It does not guarantee success for arbitrary state or payloads.
 
-Acton checked **77** scenarios. Each minimum completes the transfer and satisfies both jetton balance checks.
+Acton checked **75** scenarios. Each minimum completes the transfer and satisfies both jetton balance checks.
 One nanogram less fails. The TypeScript formula matches every Acton minimum.
 Each suggested attachment also completes the corresponding Acton transfer.
 
