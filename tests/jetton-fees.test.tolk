@@ -16,7 +16,7 @@ import "../contracts/Relay"
 import "../fixtures/config-time"
 
 /// Common TEP-74 body; the Either tag is included in forwardPayload.
-struct (0x0f8a7ea5) Transfer {
+struct (0x0f8a7ea5) JettonTransfer {
     queryId: uint64 = 1
     amount: coins = 1000000
     destination: address
@@ -26,21 +26,21 @@ struct (0x0f8a7ea5) Transfer {
     forwardPayload: RemainingBitsAndRefs
 }
 
-enum WalletLayout {
+enum JettonWalletLayout {
     Legacy
     StatusPrefix
     Sharded
 }
 
 /// Wallet fixtures use an authentic zero-balance deployment address and funded data.
-struct Variant {
+struct JettonVariant {
     name: string
-    kind: WalletLayout
+    kind: JettonWalletLayout
     library: bool
 }
 
 fun walletData(
-    layout: WalletLayout,
+    layout: JettonWalletLayout,
     balance: coins,
     owner: address,
     master: address,
@@ -48,25 +48,25 @@ fun walletData(
 ): cell {
     var data = beginCell();
 
-    if (layout == WalletLayout.StatusPrefix) {
+    if (layout == JettonWalletLayout.StatusPrefix) {
         data.storeUint(0, 4);
     }
 
     data.storeCoins(balance).storeAddress(owner).storeAddress(master);
 
-    if (layout == WalletLayout.Legacy) {
+    if (layout == JettonWalletLayout.Legacy) {
         data.storeRef(code);
     }
 
     return data.endCell();
 }
 
-fun walletAddress(variant: Variant, owner: address, master: address, code: cell): address {
+fun walletAddress(variant: JettonVariant, owner: address, master: address, code: cell): address {
     // A wallet's address uses its initial zero jetton balance. Its current
     // funded balance must never participate in address derivation.
     val state: ContractState = { code, data: walletData(variant.kind, 0, owner, master, code) };
 
-    val deploy = variant.kind == WalletLayout.Sharded
+    val deploy = variant.kind == JettonWalletLayout.Sharded
         ? AutoDeployAddress {
             stateInit: state,
             toShard: { fixedPrefixLength: 8, closeTo: owner },
@@ -76,7 +76,7 @@ fun walletAddress(variant: Variant, owner: address, master: address, code: cell)
     return deploy.calculateAddress();
 }
 
-fun jettonBalance(addr: address, layout: WalletLayout): int {
+fun jettonBalance(addr: address, layout: JettonWalletLayout): int {
     val account = testing.getAccountState(addr);
 
     if (account == null) {
@@ -91,7 +91,7 @@ fun jettonBalance(addr: address, layout: WalletLayout): int {
 
     var data = state.stateInit.data!.beginParse();
 
-    if (layout == WalletLayout.StatusPrefix) {
+    if (layout == JettonWalletLayout.StatusPrefix) {
         data.skipBits(4);
     }
 
@@ -101,7 +101,7 @@ fun jettonBalance(addr: address, layout: WalletLayout): int {
 /// A complete transfer observation. Missing compute phases keep exit code -999.
 /// fees contains transaction totalFees, while retained balances permit a
 /// separate conservation-based calculation that includes carried forwarding fees.
-struct Observation {
+struct JettonObservation {
     success: bool
     senderExit: int = -999
     receiverExit: int = -999
@@ -117,15 +117,15 @@ struct Observation {
 
 /// Restore every attempt so failed probes cannot subsidize the next probe.
 /// Success requires both jetton balances and the requested notification emission.
-fun attempt(
-    variant: Variant,
+fun attemptJetton(
+    variant: JettonVariant,
     sender: address,
     receiver: address,
     owner: address,
-    body: Transfer,
+    body: JettonTransfer,
     attached: coins,
-): Observation {
-    expect(testing.loadSnapshot("build/checkpoint.json")).toBeTrue();
+): JettonObservation {
+    expect(testing.loadSnapshot("build/jetton-checkpoint.json")).toBeTrue();
 
     // The relay's action phase supplies the real incoming forward_fee. A
     // directly injected transfer could bypass this part of the funding guard.
@@ -143,7 +143,7 @@ fun attempt(
         }),
     );
 
-    var result = Observation { success: false };
+    var result = JettonObservation { success: false };
     var transactionIndex = 0;
 
     while (transactionIndex < txs.size()) {
@@ -212,8 +212,8 @@ fun attempt(
 
 /// Find the smallest successful attachment for one fixed message and state.
 /// Every probe restores the same snapshot, including account balances and time.
-fun measure(
-    variant: Variant,
+fun measureJetton(
+    variant: JettonVariant,
     deployed: bool,
     forward: coins,
     commentBytes: int,
@@ -257,18 +257,18 @@ fun measure(
         payload.storeBool(false);
     }
 
-    val body = Transfer {
+    val body = JettonTransfer {
         destination: recipient,
         response: owner,
         forward,
         forwardPayload: payload.endCell().beginParse(),
     };
 
-    expect(testing.saveSnapshot("build/checkpoint.json")).toBeTrue();
+    expect(testing.saveSnapshot("build/jetton-checkpoint.json")).toBeTrue();
 
     var failingAmount = 0;
     var passingAmount = grams("0.2");
-    val upperBound = attempt(
+    val upperBound = attemptJetton(
         variant,
         sender,
         receiver,
@@ -287,7 +287,7 @@ fun measure(
     // resolution at one nanogram because the contracts use strict > checks.
     while (passingAmount - failingAmount > 1) {
         val candidate = (failingAmount + passingAmount) / 2;
-        val observation = attempt(
+        val observation = attemptJetton(
             variant,
             sender,
             receiver,
@@ -303,7 +303,7 @@ fun measure(
         }
     }
 
-    val below = attempt(
+    val below = attemptJetton(
         variant,
         sender,
         receiver,
@@ -313,7 +313,7 @@ fun measure(
     );
     expect(below.success).toBeFalse();
 
-    val at = attempt(
+    val at = attemptJetton(
         variant,
         sender,
         receiver,
@@ -327,14 +327,14 @@ fun measure(
     // margin applies only to variable fees, not legacy hardcoded allowances.
     var fixedAllowance = 0;
 
-    if (variant.kind == WalletLayout.Legacy) {
+    if (variant.kind == JettonWalletLayout.Legacy) {
         fixedAllowance = rawCode.hash() == build("v107").hash() ? grams("0.04") : grams("0.03");
     }
 
     val percentageMargin = mulDivCeil(passingAmount - fixedAllowance, 5, 100);
     val margin = max(100000, percentageMargin);
     val suggested = mulDivCeil(passingAmount + margin, 1, 100000) * 100000;
-    val suggestedResult = attempt(
+    val suggestedResult = attemptJetton(
         variant,
         sender,
         receiver,
@@ -364,7 +364,7 @@ fun measure(
     );
 
     println(
-        "RESULT,{},{},{},{},{}",
+        "JETTON_RESULT,{},{},{},{},{}",
         scenario,
         passingAmount,
         costs,
@@ -373,7 +373,7 @@ fun measure(
     );
 }
 
-get fun `test transfer budgets`() {
+get fun `test jetton transfer budgets`() {
     val configCell = boc.decode(fs.readBytes("fixtures/mainnet-config.boc")!)!;
     val config = createMapFromLowLevelDict<int32, cell>(configCell);
 
@@ -387,80 +387,80 @@ get fun `test transfer budgets`() {
         config.getPrecompiledContractsConfig(),
     );
 
-    val variants: array<Variant> = [
+    val variants: array<JettonVariant> = [
         {
             name: "v100",
-            kind: WalletLayout.Legacy,
+            kind: JettonWalletLayout.Legacy,
             library: false,
         },
         {
             name: "v101",
-            kind: WalletLayout.Legacy,
+            kind: JettonWalletLayout.Legacy,
             library: false,
         },
         {
             name: "v102",
-            kind: WalletLayout.Legacy,
+            kind: JettonWalletLayout.Legacy,
             library: false,
         },
         {
             name: "v103",
-            kind: WalletLayout.Legacy,
+            kind: JettonWalletLayout.Legacy,
             library: false,
         },
         {
             name: "v105",
-            kind: WalletLayout.Legacy,
+            kind: JettonWalletLayout.Legacy,
             library: false,
         },
         {
             name: "v107",
-            kind: WalletLayout.Legacy,
+            kind: JettonWalletLayout.Legacy,
             library: false,
         },
         {
             name: "m101",
-            kind: WalletLayout.Legacy,
+            kind: JettonWalletLayout.Legacy,
             library: false,
         },
         {
             name: "m102",
-            kind: WalletLayout.Legacy,
+            kind: JettonWalletLayout.Legacy,
             library: false,
         },
         {
             name: "m103",
-            kind: WalletLayout.Legacy,
+            kind: JettonWalletLayout.Legacy,
             library: false,
         },
         {
             name: "m105",
-            kind: WalletLayout.Legacy,
+            kind: JettonWalletLayout.Legacy,
             library: false,
         },
         {
             name: "minter",
-            kind: WalletLayout.Legacy,
+            kind: JettonWalletLayout.Legacy,
             library: false,
         },
         {
             name: "StablecoinWallet",
-            kind: WalletLayout.StatusPrefix,
+            kind: JettonWalletLayout.StatusPrefix,
             library: true,
         },
         {
             name: "JettonNotcoinWallet",
-            kind: WalletLayout.StatusPrefix,
+            kind: JettonWalletLayout.StatusPrefix,
             library: true,
         },
         {
             name: "Jetton2Wallet",
-            kind: WalletLayout.Sharded,
+            kind: JettonWalletLayout.Sharded,
             library: true,
         },
         {
             name: "JettonWallet",
-            kind: WalletLayout.Sharded,
+            kind: JettonWalletLayout.Sharded,
             library: false,
         },
     ];
@@ -471,11 +471,11 @@ get fun `test transfer budgets`() {
 
         println("VARIANT {} hash={:064x}", variant.name, build(variant.name).hash());
 
-        measure(variant, false, 1, 0, grams("0.01"));
-        measure(variant, true, 1, 0, grams("0.01"));
-        measure(variant, false, 0, 0, grams("0.01"));
-        measure(variant, false, 1, 32, grams("0.01"));
-        measure(variant, false, 1, 0, 0);
+        measureJetton(variant, false, 1, 0, grams("0.01"));
+        measureJetton(variant, true, 1, 0, grams("0.01"));
+        measureJetton(variant, false, 0, 0, grams("0.01"));
+        measureJetton(variant, false, 1, 32, grams("0.01"));
+        measureJetton(variant, false, 1, 0, 0);
 
         variantIndex += 1;
     }

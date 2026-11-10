@@ -5,10 +5,12 @@
   "scripts": {
     "start": "bun tools/run.ts",
     "measure": "bun tools/run.ts",
-    "compile:func": "bun tools/compile-historical.ts",
-    "refresh": "bun tools/fetch-sources.ts",
+    "compile:jettons": "bun tools/compile-jettons.ts",
+    "refresh:jettons": "bun tools/fetch-jettons.ts",
     "refresh:nfts": "bun tools/fetch-nfts.ts",
-    "report": "bun tools/report.ts",
+    "refresh:config": "bun tools/fetch-jettons.ts --config",
+    "report:jettons": "bun tools/jetton-report.ts",
+    "report:nfts": "bun tools/nft-report.ts",
     "check": "tsc --noEmit",
     "test": "bun test"
   },

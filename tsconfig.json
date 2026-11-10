@@ -6,8 +6,16 @@
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "types": ["bun-types"],
+    "types": [
+      "bun-types"
+    ],
     "allowImportingTsExtensions": true
   },
-  "include": ["tools/**/*.ts", "tests/**/*.ts", "calculator.ts", "nft-calculator.ts"]
+  "include": [
+    "tools/**/*.ts",
+    "tests/**/*.ts",
+    "jetton-calculator.ts",
+    "nft-calculator.ts",
+    "fees.ts"
+  ]
 }

@@ -35,5 +35,5 @@ Acton checked **75** scenarios. Each minimum completes the transfer and satisfie
 One nanogram less fails. The TypeScript formula matches every Acton minimum.
 Each suggested attachment also completes the corresponding Acton transfer.
 
-Full measurements, code hashes, and boundary diagnostics: [measurements.json](results/measurements.json).
+Full measurements, code hashes, and boundary diagnostics: [jetton-measurements.json](results/jetton-measurements.json).
 Method, version mapping, and wallet integration guidance: [README.md](README.md).

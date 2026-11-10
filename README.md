@@ -5,8 +5,8 @@ Acton executes original contract bytecode. TypeScript calculators reproduce the 
 
 Modern wallet BoCs and ABI interfaces come from the public [TON ABI catalog](https://github.com/ton-blockchain/abis/tree/7dc57067d85c95dc25c09ccaaf108eaba62f6303/data/jettons).
 
-The [jetton report](RESULTS.md) and [NFT report](NFT_RESULTS.md) contain the measured amounts.
-The [complete measurements](results/measurements.json) include code hashes, gas usage, retained balances, excesses, and failure diagnostics.
+The [jetton report](JETTON_RESULTS.md) and [NFT report](NFT_RESULTS.md) contain the measured amounts.
+The [jetton measurements](results/jetton-measurements.json) and [NFT measurements](results/nft-measurements.json) include code hashes, gas usage, retained balances, excesses, and failure diagnostics.
 One GRAM equals 1,000,000,000 nanograms. All calculations use integers.
 
 ## Run the study
@@ -20,25 +20,26 @@ bun install --frozen-lockfile
 bun start
 ```
 
-The command runs both Acton suites, checks their result snapshots, and writes `RESULTS.md` and `NFT_RESULTS.md`.
+The command runs both Acton suites, checks their result snapshots, and writes `JETTON_RESULTS.md` and `NFT_RESULTS.md`.
 Contract BoCs and network configuration are local fixtures. Normal runs need no RPC credentials, source downloads, or separate FunC installation.
 Acton installs its standard library on first use if `.acton` is absent.
-Full diagnostics remain in `results/acton.log` and `results/nft-acton.log`.
+Full diagnostics remain in `results/jetton-acton.log` and `results/nft-acton.log`.
 
 Other commands:
 
 ```bash
 bun run check
 bun test
-bun run compile:func
-bun run report
+bun run compile:jettons
+bun run report:jettons
+bun run report:nfts
 ```
 
-`compile:func` rebuilds historical FunC wallets with project dependencies and checks their code hashes.
+`compile:jettons` rebuilds historical FunC wallets with project dependencies and checks their code hashes.
 It uses FunC 0.4.6 through the pinned `func-js` dependency.
 It requires no `NODE_PATH`. TypeScript scripts run directly through Bun.
 
-## Main finding
+## Jetton transfer budgets
 
 There is no single efficient attachment for all jetton-wallets.
 Modern wallets price gas and storage from network configuration. Older wallets enforce fixed GRAM amounts even when network prices decrease.
@@ -73,7 +74,7 @@ They verify ownership changes, outgoing messages, exact failure boundaries, and 
 
 Sales, auctions, minting, editorship transfers, DNS, TeleMint, Telegram gifts, and custom NFT forks are outside this study.
 
-## Attached value and transaction cost
+## Jetton attachment and transaction cost
 
 An attachment is a temporary transfer budget. It includes network costs, forwarded value, storage funding, and possible excesses.
 It is not the transaction fee.
@@ -101,7 +102,7 @@ Old wallets retain much more than their nominal 0.01 GRAM storage reserve.
 For a new recipient, version 1.07 retains about **0.02493 GRAM** in this experiment.
 That retained balance is not a validator fee. It is also not an immediate refund to the user.
 
-## Covered versions
+## Covered jetton versions
 
 The mapping follows the upstream [version history](https://github.com/ton-blockchain/jetton-contract/blob/jetton-2.0/VERSION_HISTORY.md).
 Wallet code hashes, rather than marketing names or getter interfaces, identify the measured implementations.
@@ -127,7 +128,7 @@ Mintless claims, swaps, burns, governance operations, and custom wallet forks ar
 Mintless is a separate implementation family in the version history.
 The Acton 2.1 row is an additional implementation, not a historical FunC release.
 
-## Measurement method
+## Jetton measurement method
 
 The study uses mainnet prices from one pinned masterchain block.
 [config-provenance.json](fixtures/config-provenance.json) records the block, fetch time, and BoC checksum.
@@ -162,9 +163,9 @@ The test requires notification emission, not successful execution of arbitrary r
 The search resolves the boundary to one nanogram and checks both neighboring amounts.
 The TypeScript formula independently matches all measured boundaries.
 Acton also checks that each suggested attachment completes the transfer.
-The complete result table is compared with [expected-results.json](fixtures/expected-results.json).
+The complete result table is compared with [jetton-expected-results.json](fixtures/jetton-expected-results.json).
 
-## Funding formulas
+## Jetton funding formulas
 
 For legacy wallets, the sender requires:
 
@@ -193,16 +194,17 @@ For USDT, ConfigParam 45 uses the **deployed library-reference hash**.
 Using the resolved code hash instead misses the precompiled discount.
 
 Every strict comparison adds one nanogram to the calculated right-hand side.
-`calculator.ts` preserves the protocol's integer ceilings and floors.
+`jetton-calculator.ts` preserves the protocol's integer ceilings and floors.
+The shared `fees.ts` module provides network pricing, `incomingForwardFee()`, and `suggestedAttachment()` for both calculators.
 `incomingForwardFee()` calculates the remaining forwarding fee from the exact serialized internal message.
 
-## Wallet integration algorithm
+## Jetton wallet integration algorithm
 
 - Read sender code, recipient state, library availability, and network configuration from a consistent block.
 - Match the deployed code and resolved library hash against a supported profile.
 - Build the exact TEP-74 request with its real amount, response address, forward value, and payload.
 - Calculate the inbound forwarding fee from the actual owner-wallet message serialization.
-- Calculate the sender's funding threshold with `minimumAttachment()`.
+- Calculate the sender's funding threshold with `minimumJettonAttachment()`.
 - Emulate the complete transfer against actual account state, including deployment and bounces.
 - If the trace fails because of funding, increase the budget and repeat from the original state.
 - If the trace fails because of a lock, authorization, balance, or invalid payload, report that error instead.
@@ -222,19 +224,19 @@ The user must have the attachment plus the ordinary wallet's own execution and f
 
 ## Refresh inputs
 
-The revisions are recorded in [sources.json](fixtures/sources.json).
+The jetton source revisions are recorded in [jetton-sources.json](fixtures/jetton-sources.json).
 
-To download the same pinned upstream sources:
+To download the same pinned upstream jetton sources:
 
 ```bash
-bun run refresh
-bun run compile:func
+bun run refresh:jettons
+bun run compile:jettons
 ```
 
 To replace the configuration with a new mainnet block:
 
 ```bash
-bun tools/fetch-sources.ts --config
+bun run refresh:config
 bun start
 ```
 

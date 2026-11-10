@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 
 const root = resolve(import.meta.dir, "..");
 type Source = { repository: string; revision: string };
-const sources: Record<string, Source> = JSON.parse(await readFile(join(root, "fixtures/sources.json"), "utf8"));
+const sources: Record<string, Source> = JSON.parse(await readFile(join(root, "fixtures/jetton-sources.json"), "utf8"));
 
 async function download(url: string): Promise<Buffer> {
   const started = performance.now();
@@ -68,7 +68,7 @@ if (process.argv.includes("--config")) {
   }, null, 2)}\n`);
 
   await writeFile(join(root, "fixtures/config-time.tolk"),
-    "// Recorded configuration fetch time. Refreshed by tools/fetch-sources.ts --config.\n"
+    "// Recorded configuration fetch time. Refreshed by tools/fetch-jettons.ts --config.\n"
     + `const MEASUREMENT_TIME = ${Math.floor(fetchedAt.getTime() / 1000)}\n`);
 } else {
   for (const [name, source] of Object.entries(sources)) {

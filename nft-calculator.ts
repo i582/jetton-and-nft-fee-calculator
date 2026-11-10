@@ -1,4 +1,4 @@
-import { computeFee, type FeeConfig } from "./calculator";
+import { computeFee, type FeeConfig } from "./fees";
 
 /**
  * Exact deployed bytecode identifies these initialized NFT item profiles.

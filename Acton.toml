@@ -10,16 +10,16 @@ acton = "1.2.0"
 src = "contracts/Relay.tolk"
 
 [contracts.m101]
-src = "contracts/m101.boc"
+src = "contracts/jetton/m101.boc"
 
 [contracts.m102]
-src = "contracts/m102.boc"
+src = "contracts/jetton/m102.boc"
 
 [contracts.m103]
-src = "contracts/m103.boc"
+src = "contracts/jetton/m103.boc"
 
 [contracts.m105]
-src = "contracts/m105.boc"
+src = "contracts/jetton/m105.boc"
 
 [fmt]
 width = 100
@@ -31,41 +31,41 @@ measure = "bun start"
 acton = ".acton"
 
 [contracts.Jetton2Wallet]
-src = "contracts/Jetton2Wallet.boc"
-types = "contracts/Jetton2Wallet.types.tolk"
+src = "contracts/jetton/Jetton2Wallet.boc"
+types = "contracts/jetton/Jetton2Wallet.types.tolk"
 
 [contracts.JettonNotcoinWallet]
-src = "contracts/JettonNotcoinWallet.boc"
-types = "contracts/JettonNotcoinWallet.types.tolk"
+src = "contracts/jetton/JettonNotcoinWallet.boc"
+types = "contracts/jetton/JettonNotcoinWallet.types.tolk"
 
 [contracts.JettonWallet]
-src = "contracts/JettonWallet.boc"
-types = "contracts/JettonWallet.types.tolk"
+src = "contracts/jetton/JettonWallet.boc"
+types = "contracts/jetton/JettonWallet.types.tolk"
 
 [contracts.StablecoinWallet]
-src = "contracts/StablecoinWallet.boc"
-types = "contracts/StablecoinWallet.types.tolk"
+src = "contracts/jetton/StablecoinWallet.boc"
+types = "contracts/jetton/StablecoinWallet.types.tolk"
 
 [contracts.minter]
-src = "contracts/minter.boc"
+src = "contracts/jetton/minter.boc"
 
 [contracts.v100]
-src = "contracts/v100.boc"
+src = "contracts/jetton/v100.boc"
 
 [contracts.v101]
-src = "contracts/v101.boc"
+src = "contracts/jetton/v101.boc"
 
 [contracts.v102]
-src = "contracts/v102.boc"
+src = "contracts/jetton/v102.boc"
 
 [contracts.v103]
-src = "contracts/v103.boc"
+src = "contracts/jetton/v103.boc"
 
 [contracts.v105]
-src = "contracts/v105.boc"
+src = "contracts/jetton/v105.boc"
 
 [contracts.v107]
-src = "contracts/v107.boc"
+src = "contracts/jetton/v107.boc"
 
 [contracts.NftV1Item]
 src = "contracts/nft/NftV1Item.boc"

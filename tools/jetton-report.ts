@@ -1,16 +1,17 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { Cell, beginCell } from "@ton/core";
-import { minimumAttachment, parseConfig, profiles, suggestedAttachment } from "../calculator";
+import { minimumJettonAttachment, jettonProfiles } from "../jetton-calculator";
+import { parseConfig, suggestedAttachment } from "../fees";
 
 const root = resolve(import.meta.dir, "..");
-const log = await readFile(join(root, "results/acton.log"), "utf8");
+const log = await readFile(join(root, "results/jetton-acton.log"), "utf8");
 const block = JSON.parse(await readFile(join(root, "fixtures/mainnet-block.json"), "utf8"));
 const provenance = JSON.parse(await readFile(join(root, "fixtures/config-provenance.json"), "utf8"));
 const configCell = Cell.fromBoc(await readFile(join(root, "fixtures/mainnet-config.boc")))[0];
 const config = parseConfig(configCell, Math.floor(Date.parse(provenance.fetchedAt) / 1000));
 
-export interface Measurement {
+export interface JettonMeasurement {
   variant: string;
   deployed: boolean;
   forward: string;
@@ -32,10 +33,10 @@ export interface Measurement {
   deployedCodeHash: string;
 }
 
-const measurements: Measurement[] = [];
+const measurements: JettonMeasurement[] = [];
 
 for (const line of log.split("\n")) {
-  const marker = line.indexOf("RESULT,");
+  const marker = line.indexOf("JETTON_RESULT,");
   if (marker < 0) continue;
 
   const fields = line.slice(marker).trim().split(",");
@@ -45,16 +46,16 @@ for (const line of log.split("\n")) {
     senderGas, receiverGas, fees, excess, senderAfter, receiverAfter, incomingFee,
     belowSenderExit, belowReceiverExit, testedSuggestion] = fields;
 
-  const profile = profiles[variant];
+  const profile = jettonProfiles[variant];
   if (!profile) throw new Error(`Missing fee profile for ${variant}`);
 
-  const code = Cell.fromBoc(await readFile(join(root, "contracts", `${variant}.boc`)))[0];
+  const code = Cell.fromBoc(await readFile(join(root, "contracts/jetton", `${variant}.boc`)))[0];
   const usesLibrary = profile.family === "modern" && variant !== "JettonWallet";
   const deployedCode = usesLibrary
     ? beginCell().storeUint(2, 8).storeBuffer(code.hash()).endCell({ exotic: true })
     : code;
 
-  const guard = minimumAttachment(profile, config, BigInt(incomingFee), BigInt(forward), deployedCode.hash().toString("hex"));
+  const guard = minimumJettonAttachment(profile, config, BigInt(incomingFee), BigInt(forward), deployedCode.hash().toString("hex"));
   if (guard !== BigInt(minimum)) {
     throw new Error(`${variant}: Acton minimum ${minimum} differs from analytic guard ${guard}`);
   }
@@ -87,19 +88,19 @@ for (const line of log.split("\n")) {
 }
 
 if (measurements.length !== 75 || !log.includes("1 passed")) {
-  throw new Error(`Incomplete Acton run: found ${measurements.length} scenarios; see results/acton.log`);
+  throw new Error(`Incomplete Acton run: found ${measurements.length} scenarios; see results/jetton-acton.log`);
 }
 
 const serialized = `${JSON.stringify(measurements, null, 2)}\n`;
-const snapshot = join(root, "fixtures/expected-results.json");
+const snapshot = join(root, "fixtures/jetton-expected-results.json");
 
 // Preserve the new observations even when they differ from the accepted baseline.
-await writeFile(join(root, "results/measurements.json"), serialized);
+await writeFile(join(root, "results/jetton-measurements.json"), serialized);
 
 if (process.argv.includes("--update")) {
   await writeFile(snapshot, serialized);
 } else if (await readFile(snapshot, "utf8") !== serialized) {
-  throw new Error("results/measurements.json differs from fixtures/expected-results.json; inspect the changes before bun report --update");
+  throw new Error("results/jetton-measurements.json differs from fixtures/jetton-expected-results.json; inspect the changes before bun run report:jettons --update");
 }
 
 function gram(value: string | bigint): string {
@@ -133,9 +134,9 @@ Acton checked **${measurements.length}** scenarios. Each minimum completes the t
 One nanogram less fails. The TypeScript formula matches every Acton minimum.
 Each suggested attachment also completes the corresponding Acton transfer.
 
-Full measurements, code hashes, and boundary diagnostics: [measurements.json](results/measurements.json).
+Full measurements, code hashes, and boundary diagnostics: [jetton-measurements.json](results/jetton-measurements.json).
 Method, version mapping, and wallet integration guidance: [README.md](README.md).
 `;
 
-await writeFile(join(root, "RESULTS.md"), markdown);
-console.log(JSON.stringify({ operation: "report", target: "RESULTS.md", outcome: "ok", scenarios: measurements.length }));
+await writeFile(join(root, "JETTON_RESULTS.md"), markdown);
+console.log(JSON.stringify({ operation: "report", target: "JETTON_RESULTS.md", outcome: "ok", scenarios: measurements.length }));

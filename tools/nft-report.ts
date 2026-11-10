@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { Cell } from "@ton/core";
-import { parseConfig, suggestedAttachment } from "../calculator";
+import { parseConfig, suggestedAttachment } from "../fees";
 import { minimumNftAttachment } from "../nft-calculator";
 
 const root = resolve(import.meta.dir, "..");

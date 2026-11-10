@@ -11,7 +11,7 @@ if (await version.exited !== 0) throw new Error("acton --version failed");
 console.log(versionText);
 
 const studies = [
-  { target: "ordinary jetton transfers", test: "fees", log: "acton.log", report: "report" },
+  { target: "ordinary jetton transfers", test: "jetton-fees", log: "jetton-acton.log", report: "jetton-report" },
   { target: "ordinary NFT transfers", test: "nft-fees", log: "nft-acton.log", report: "nft-report" },
 ];
 
@@ -57,4 +57,4 @@ for (const study of studies) {
   }
 }
 
-console.log("Open RESULTS.md and NFT_RESULTS.md for measurements, README.md for usage");
+console.log("Open JETTON_RESULTS.md and NFT_RESULTS.md for measurements, README.md for usage");

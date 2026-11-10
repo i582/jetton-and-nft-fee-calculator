@@ -6,7 +6,7 @@ import { Cell } from "@ton/core";
 
 const root = resolve(import.meta.dir, "..");
 const versions = ["v100", "v101", "v102", "v103", "v105", "v107", "m101", "m102", "m103", "m105", "minter"];
-const expected = JSON.parse(await readFile(resolve(root, "fixtures/historical-build.json"), "utf8"));
+const expected = JSON.parse(await readFile(resolve(root, "fixtures/jetton-historical-build.json"), "utf8"));
 
 const metadata = {
   compiler: await compilerVersion(),
@@ -37,7 +37,7 @@ for (const version of versions) {
     throw new Error(`${version}: rebuilt code hash differs from the recorded fixture`);
   }
 
-  await writeFile(resolve(root, "contracts", `${version}.boc`), bytes);
+  await writeFile(resolve(root, "contracts/jetton", `${version}.boc`), bytes);
   metadata.contracts[version] = { codeHash, targets };
 
   console.log(JSON.stringify({
@@ -46,4 +46,4 @@ for (const version of versions) {
   }));
 }
 
-await writeFile(resolve(root, "fixtures/historical-build.json"), `${JSON.stringify(metadata, null, 2)}\n`);
+await writeFile(resolve(root, "fixtures/jetton-historical-build.json"), `${JSON.stringify(metadata, null, 2)}\n`);

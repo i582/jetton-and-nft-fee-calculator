@@ -4,16 +4,15 @@ import { resolve } from "node:path";
 import { Address, beginCell, Cell, internal, storeMessageRelaxed } from "@ton/core";
 import {
   incomingForwardFee,
-  minimumAttachment,
   parseConfig,
-  profiles,
   suggestedAttachment,
-} from "../calculator";
+} from "../fees";
+import { minimumJettonAttachment, jettonProfiles } from "../jetton-calculator";
 import { minimumNftAttachment } from "../nft-calculator";
 import type { NftMeasurement } from "../tools/nft-report";
 
 const root = resolve(import.meta.dir, "..");
-const rows = JSON.parse(readFileSync(resolve(root, "fixtures/expected-results.json"), "utf8")) as Array<{
+const jettonRows = JSON.parse(readFileSync(resolve(root, "fixtures/jetton-expected-results.json"), "utf8")) as Array<{
   variant: string;
   forward: string;
   commentBytes: number;
@@ -34,10 +33,10 @@ const nftRows: NftMeasurement[] = JSON.parse(
 );
 
 describe("agreement with complete Acton traces", () => {
-  test("funding formulas and margin match every recorded scenario", () => {
-    const calculated = rows.map(row => {
-      const profile = profiles[row.variant];
-      const minimum = minimumAttachment(
+  test("jetton funding formulas and margin match every recorded scenario", () => {
+    const calculated = jettonRows.map(row => {
+      const profile = jettonProfiles[row.variant];
+      const minimum = minimumJettonAttachment(
         profile,
         config,
         BigInt(row.incomingForwardFee),
@@ -53,15 +52,15 @@ describe("agreement with complete Acton traces", () => {
     });
 
     // The fixture is produced by complete Acton traces, not by this calculator.
-    expect(calculated).toEqual(rows.map(({ minimum, suggested }) => ({ minimum, suggested })));
+    expect(calculated).toEqual(jettonRows.map(({ minimum, suggested }) => ({ minimum, suggested })));
   });
 
-  test("serialized request forwarding fees match the owner's action phase", () => {
+  test("serialized jetton request forwarding fees match the owner's action phase", () => {
     const owner = Address.parseRaw(`0:${"11".repeat(32)}`);
     const recipient = Address.parseRaw(`0:${"22".repeat(32)}`);
     const senderJettonWallet = Address.parseRaw(`0:${"33".repeat(32)}`);
 
-    const calculated = rows.map(row => {
+    const calculated = jettonRows.map(row => {
       const body = beginCell()
         .storeUint(0x0f8a7ea5, 32)
         .storeUint(1, 64)
@@ -94,7 +93,7 @@ describe("agreement with complete Acton traces", () => {
       return incomingForwardFee(serialized, config).toString();
     });
 
-    expect(calculated).toEqual(rows.map(row => row.incomingForwardFee));
+    expect(calculated).toEqual(jettonRows.map(row => row.incomingForwardFee));
   });
 
   test("NFT funding bounds match committed ownership transfers", () => {
