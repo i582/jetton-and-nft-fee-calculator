@@ -1,6 +1,6 @@
 [package]
 name = "jetton-transfer-fees"
-description = "Reproducible GRAM budgets for ordinary jetton transfers"
+description = "Reproducible GRAM budgets for ordinary jetton and NFT transfers"
 version = "0.1.0"
 
 [toolchain]
@@ -25,7 +25,7 @@ src = "contracts/m105.boc"
 width = 100
 
 [scripts]
-measure = "acton test tests/fees.test.tolk"
+measure = "bun start"
 
 [import-mappings]
 acton = ".acton"
@@ -66,3 +66,19 @@ src = "contracts/v105.boc"
 
 [contracts.v107]
 src = "contracts/v107.boc"
+
+[contracts.NftV1Item]
+src = "contracts/nft/NftV1Item.boc"
+types = "contracts/nft/NftV1Item.types.tolk"
+
+[contracts.NftV1EditableItem]
+src = "contracts/nft/NftV1EditableItem.boc"
+types = "contracts/nft/NftV1EditableItem.types.tolk"
+
+[contracts.GetgemsNftItemV2]
+src = "contracts/nft/GetgemsNftItemV2.boc"
+types = "contracts/nft/GetgemsNftItemV2.types.tolk"
+
+[contracts.GetgemsNftEditableItemV2]
+src = "contracts/nft/GetgemsNftEditableItemV2.boc"
+types = "contracts/nft/GetgemsNftEditableItemV2.types.tolk"

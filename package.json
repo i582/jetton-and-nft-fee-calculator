@@ -7,6 +7,7 @@
     "measure": "bun tools/run.ts",
     "compile:func": "bun tools/compile-historical.ts",
     "refresh": "bun tools/fetch-sources.ts",
+    "refresh:nfts": "bun tools/fetch-nfts.ts",
     "report": "bun tools/report.ts",
     "check": "tsc --noEmit",
     "test": "bun test"

@@ -1,11 +1,11 @@
-# GRAM budgets for ordinary jetton transfers
+# GRAM budgets for jetton and NFT transfers
 
-This study measures the smallest attachment that completes an ordinary jetton transfer.
-Acton executes original wallet bytecode. A TypeScript calculator reproduces each contract's funding check.
+This study measures the smallest attachment that completes an ordinary jetton or NFT ownership transfer.
+Acton executes original contract bytecode. TypeScript calculators reproduce the measured funding boundaries.
 
 Modern wallet BoCs and ABI interfaces come from the public [TON ABI catalog](https://github.com/ton-blockchain/abis/tree/7dc57067d85c95dc25c09ccaaf108eaba62f6303/data/jettons).
 
-The [generated report](RESULTS.md) contains the measured amounts.
+The [jetton report](RESULTS.md) and [NFT report](NFT_RESULTS.md) contain the measured amounts.
 The [complete measurements](results/measurements.json) include code hashes, gas usage, retained balances, excesses, and failure diagnostics.
 One GRAM equals 1,000,000,000 nanograms. All calculations use integers.
 
@@ -20,10 +20,10 @@ bun install --frozen-lockfile
 bun start
 ```
 
-The command runs Acton, checks the result snapshot, and writes `RESULTS.md`.
+The command runs both Acton suites, checks their result snapshots, and writes `RESULTS.md` and `NFT_RESULTS.md`.
 Contract BoCs and network configuration are local fixtures. Normal runs need no RPC credentials, source downloads, or separate FunC installation.
 Acton installs its standard library on first use if `.acton` is absent.
-Full diagnostics remain in `results/acton.log`.
+Full diagnostics remain in `results/acton.log` and `results/nft-acton.log`.
 
 Other commands:
 
@@ -53,6 +53,25 @@ These amounts apply to the exact message and state described in the report.
 The USDT library-reference hash matches a public deployed wallet.
 [usdt-code-check.json](fixtures/usdt-code-check.json) records that check.
 The transfer scenarios use synthetic accounts, not that holder's state.
+
+## NFT ownership transfers
+
+NFT transfers change the owner of an existing item contract. They do not deploy a recipient jetton-wallet.
+The calculator covers four bytecode implementations from the public TON ABI catalog:
+standard v1.03, editable v1.02/v1.03, Getgems V2, and Getgems editable V2.
+The catalog's NFT 1 and NFT 2.0 item fixtures have identical code hashes and share the same measurements.
+
+At the recorded block, all four need a suggested **0.0007 GRAM** when the NFT already holds 0.05 GRAM.
+This assumes one forwarded nanogram, a refund address, and no comment.
+After a previous transfer has spent part of that reserve, the standard item needs **0.0009 GRAM** under the same policy.
+An NFT with no GRAM needs **0.0504 GRAM** under the same policy. Most of that value stays on the NFT.
+
+The [NFT report](NFT_RESULTS.md) explains the balance-dependent formula and the wallet integration algorithm.
+Use `minimumNftAttachment()` from `nft-calculator.ts` for the four supported code hashes, followed by full-trace emulation.
+The 36 Acton scenarios cover initial balances, notifications, refunds, and a referenced comment.
+They verify ownership changes, outgoing messages, exact failure boundaries, and proposed attachment values.
+
+Sales, auctions, minting, editorship transfers, DNS, TeleMint, Telegram gifts, and custom NFT forks are outside this study.
 
 ## Attached value and transaction cost
 
@@ -221,4 +240,10 @@ bun start
 
 A changed result fails the snapshot comparison.
 After review, accept the new baseline with `bun start --update`.
-The update flag changes `fixtures/expected-results.json` explicitly.
+The update flag changes both accepted result snapshots explicitly.
+
+To download the same NFT bytecode and ABI interfaces from the pinned public catalog:
+
+```bash
+bun run refresh:nfts
+```

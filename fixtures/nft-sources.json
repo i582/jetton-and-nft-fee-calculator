@@ -1,0 +1,26 @@
+[
+  {
+    "name": "NftV1Item",
+    "codeHash": "ba4d975d2b66231c1f0a0ccca6e8ff8f7ba0610c4b7639584b8e98303dc3128c",
+    "codeUrl": "https://raw.githubusercontent.com/ton-blockchain/abis/7dc57067d85c95dc25c09ccaaf108eaba62f6303/data/nfts/nft_1/testdata/NftV1Item.boc",
+    "typesUrl": "https://raw.githubusercontent.com/ton-blockchain/abis/7dc57067d85c95dc25c09ccaaf108eaba62f6303/data/nfts/nft_1/types/nft_v1_item.types.tolk"
+  },
+  {
+    "name": "NftV1EditableItem",
+    "codeHash": "e9d46f1ad4f3d05866b9800a3dc2202e4730bed1d344a54999b5e20f7f5226cc",
+    "codeUrl": "https://raw.githubusercontent.com/ton-blockchain/abis/7dc57067d85c95dc25c09ccaaf108eaba62f6303/data/nfts/nft_1/testdata/NftV1EditableItem.boc",
+    "typesUrl": "https://raw.githubusercontent.com/ton-blockchain/abis/7dc57067d85c95dc25c09ccaaf108eaba62f6303/data/nfts/nft_1/types/nft_v1_editable_item.types.tolk"
+  },
+  {
+    "name": "GetgemsNftItemV2",
+    "codeHash": "02e3a2370ea36b24eabff810cd84ef63dc180443d0b51adb9d3be4c0ea8f7319",
+    "codeUrl": "https://raw.githubusercontent.com/ton-blockchain/abis/7dc57067d85c95dc25c09ccaaf108eaba62f6303/data/nfts/getgems_nft_2_0/testdata/GetgemsNftItemV2.boc",
+    "typesUrl": "https://raw.githubusercontent.com/ton-blockchain/abis/7dc57067d85c95dc25c09ccaaf108eaba62f6303/data/nfts/getgems_nft_2_0/types/getgems_nft_v2_item.types.tolk"
+  },
+  {
+    "name": "GetgemsNftEditableItemV2",
+    "codeHash": "585913bfeb388db1997d2befb1806f2c79f1821337e1b0e8fb182bdec40e28c2",
+    "codeUrl": "https://raw.githubusercontent.com/ton-blockchain/abis/7dc57067d85c95dc25c09ccaaf108eaba62f6303/data/nfts/getgems_nft_2_0/testdata/GetgemsNftEditableItemV2.boc",
+    "typesUrl": "https://raw.githubusercontent.com/ton-blockchain/abis/7dc57067d85c95dc25c09ccaaf108eaba62f6303/data/nfts/getgems_nft_2_0/types/getgems_nft_v2_editable_item.types.tolk"
+  }
+]

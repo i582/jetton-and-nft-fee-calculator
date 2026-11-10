@@ -4,6 +4,10 @@ struct (0x12345678) RelayTransfer {
     destination: address
     attached: coins
     body: cell
+    // Keep the synthetic driver envelope's body out of the root cell even
+    // after source and forwarding-fee fields are filled in. This padding never
+    // enters the actual transfer request or its measured forwarding fee.
+    padding: uint256 = 0
 }
 
 fun onInternalMessage(in: InMessage) {

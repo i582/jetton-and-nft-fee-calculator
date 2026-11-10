@@ -9,5 +9,5 @@
     "types": ["bun-types"],
     "allowImportingTsExtensions": true
   },
-  "include": ["tools/**/*.ts", "tests/**/*.ts", "calculator.ts"]
+  "include": ["tools/**/*.ts", "tests/**/*.ts", "calculator.ts", "nft-calculator.ts"]
 }
