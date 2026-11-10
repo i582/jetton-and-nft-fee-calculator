@@ -1,0 +1,58 @@
+{
+  "v100": {
+    "repository": "ton-blockchain/token-contract",
+    "revision": "1ad314a98d20b41241d5329e1786fc894ad811de"
+  },
+  "v101": {
+    "repository": "ton-blockchain/token-contract",
+    "revision": "72f03419187c8514e936461d1b02a5e19a2ee651"
+  },
+  "v102": {
+    "repository": "ton-blockchain/token-contract",
+    "revision": "a325fa5c6b531537652b18cda8c9cf6da2f0fe56"
+  },
+  "v103": {
+    "repository": "ton-blockchain/token-contract",
+    "revision": "9fe7acada1fca6a8358dd671e146ad1af3c35dbd"
+  },
+  "v105": {
+    "repository": "ton-blockchain/token-contract",
+    "revision": "7d20957ea8d73a6af6e37a7b206db982faa346a3"
+  },
+  "v107": {
+    "repository": "ton-blockchain/token-contract",
+    "revision": "733f3793012405267202c9c245a9d87fda37f5f4"
+  },
+  "stablecoin": {
+    "repository": "ton-blockchain/stablecoin-contract",
+    "revision": "5a3b500267b0bdfc6505a08e5ac661c805cab8b0"
+  },
+  "v12": {
+    "repository": "ton-blockchain/jetton-contract",
+    "revision": "d55f228edb0eb477cb4845d67e0dacc6489c6b57"
+  },
+  "v20": {
+    "repository": "ton-blockchain/jetton-contract",
+    "revision": "f2fb1fbb65d8e8ce6ec9f813f3e3dfab9268912a"
+  },
+  "minter": {
+    "repository": "ton-blockchain/minter-contract",
+    "revision": "074b7d5f45f43552146fdf54f972020b2757bc18"
+  },
+  "m101": {
+    "repository": "ton-blockchain/minter-contract",
+    "revision": "fd5e8ef598e0a04ffbc83e489824ab9aa1f8a6bd"
+  },
+  "m102": {
+    "repository": "ton-blockchain/minter-contract",
+    "revision": "2d7fcb20c1405b98c696557b54dceb2c632694c3"
+  },
+  "m103": {
+    "repository": "ton-blockchain/minter-contract",
+    "revision": "be74086365fd780246024ec892877e54b6559998"
+  },
+  "m105": {
+    "repository": "ton-blockchain/minter-contract",
+    "revision": "c03374b9341a0f26995860b6f6fedc9dafdf1a38"
+  }
+}

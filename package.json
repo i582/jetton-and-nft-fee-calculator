@@ -1,0 +1,22 @@
+{
+  "name": "jetton-transfer-fees",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "bun tools/run.ts",
+    "measure": "bun tools/run.ts",
+    "compile:func": "bun tools/compile-historical.ts",
+    "refresh": "bun tools/fetch-sources.ts",
+    "report": "bun tools/report.ts",
+    "check": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@ton-community/func-js": "0.11.0",
+    "@ton/core": "0.63.1"
+  },
+  "devDependencies": {
+    "bun-types": "1.4.0",
+    "typescript": "5.9.3"
+  }
+}

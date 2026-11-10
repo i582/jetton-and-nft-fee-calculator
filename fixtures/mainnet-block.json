@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "result": {
+    "@type": "blocks.masterchainInfo",
+    "last": {
+      "@type": "ton.blockIdExt",
+      "workchain": -1,
+      "shard": "-9223372036854775808",
+      "seqno": 104490013,
+      "root_hash": "N5A7S3b3CklbJs8A+Z11RZ6d+CxG8o5LAaSsZ6AUjuY=",
+      "file_hash": "0CO7JDvzWfXLoAEDdML1/dElkJddfK4RxRkFRAKmXS4="
+    },
+    "state_root_hash": "Ow9UV1t7HRnl0bdmXQDBIte2LO9utYiGHw1NtdnG6o4=",
+    "init": {
+      "@type": "ton.blockIdExt",
+      "workchain": -1,
+      "shard": "0",
+      "seqno": 0,
+      "root_hash": "F6OpKZKqvqeFp6CQmFomXNMfMj2EnaUSOXN+Mh+wVWk=",
+      "file_hash": "XplPz01CXAps5qeSWUtxcyBfdAo5zVb1N979KLSKD24="
+    }
+  },
+  "@extra": "1794287240:_:0.002:c"
+}

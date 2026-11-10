@@ -1,0 +1,99 @@
+{
+  "compiler": {
+    "funcVersion": "0.4.6",
+    "funcFiftLibCommitHash": "4ebd7412c52248360464c2df5f434c8aaa3edfe1",
+    "funcFiftLibCommitDate": "2025-10-10 12:44:15 +0300"
+  },
+  "contracts": {
+    "v100": {
+      "codeHash": "b8b2fb226e29921f3c1b8860075d38e53b0bec2981676f2bd199569fef25f203",
+      "targets": [
+        "stdlib.fc",
+        "ft/params.fc",
+        "ft/op-codes.fc",
+        "ft/jetton-utils.fc",
+        "ft/jetton-wallet.fc"
+      ]
+    },
+    "v101": {
+      "codeHash": "4adf48135cb575adbaed476799c87ff2904269b1f949ada4d0479e9104b6f217",
+      "targets": [
+        "stdlib.fc",
+        "ft/params.fc",
+        "ft/op-codes.fc",
+        "ft/jetton-utils.fc",
+        "ft/jetton-wallet.fc"
+      ]
+    },
+    "v102": {
+      "codeHash": "42945230abfb0f98b197445c3880faf26a164455fe8f93b6425786b3e2889c8b",
+      "targets": [
+        "stdlib.fc",
+        "ft/params.fc",
+        "ft/op-codes.fc",
+        "ft/jetton-utils.fc",
+        "ft/jetton-wallet.fc"
+      ]
+    },
+    "v103": {
+      "codeHash": "cd2705487b1848dd5731a4b6533606c407a33ad82925216908ad2c87c543294a",
+      "targets": [
+        "stdlib.fc",
+        "ft/params.fc",
+        "ft/op-codes.fc",
+        "ft/jetton-utils.fc",
+        "ft/jetton-wallet.fc"
+      ]
+    },
+    "v105": {
+      "codeHash": "d1b97ebd0e1b1b038dbe8af9c87e77ca1773eb699131dc12c7979cced9dd00fc",
+      "targets": [
+        "stdlib.fc",
+        "ft/params.fc",
+        "ft/op-codes.fc",
+        "ft/jetton-utils.fc",
+        "ft/jetton-wallet.fc"
+      ]
+    },
+    "v107": {
+      "codeHash": "a760d629d5343e76d045017d9dc216fc8a307a8377815feb2b0a5c490e733486",
+      "targets": [
+        "stdlib.fc",
+        "ft/params.fc",
+        "ft/op-codes.fc",
+        "ft/jetton-utils.fc",
+        "ft/jetton-wallet.fc"
+      ]
+    },
+    "m101": {
+      "codeHash": "ddac4389ae1e0949d3562c6a534fc1500e22f2277906d570d69b7fc9ac9977a9",
+      "targets": [
+        "contracts/jetton-wallet.fc"
+      ]
+    },
+    "m102": {
+      "codeHash": "6bcf6e383a4cce2b8b3cc8ea5b6a092e3550a260ac6e2a0e348b6ddbd398672b",
+      "targets": [
+        "contracts/jetton-wallet.fc"
+      ]
+    },
+    "m103": {
+      "codeHash": "73d255a3c1d9f81566dcdc598ee4d5aa137c2c5d800f30f76df1457846c85d00",
+      "targets": [
+        "contracts/jetton-wallet.fc"
+      ]
+    },
+    "m105": {
+      "codeHash": "beb0683ebeb8927fe9fc8ec0a18bc7dd17899689825a121eab46c5a3a860d0ce",
+      "targets": [
+        "contracts/jetton-wallet.fc"
+      ]
+    },
+    "minter": {
+      "codeHash": "beb0683ebeb8927fe9fc8ec0a18bc7dd17899689825a121eab46c5a3a860d0ce",
+      "targets": [
+        "contracts/jetton-wallet.fc"
+      ]
+    }
+  }
+}

@@ -1,0 +1,71 @@
+[package]
+name = "jetton-transfer-fees"
+description = "Reproducible GRAM budgets for ordinary jetton transfers"
+version = "0.1.0"
+
+[toolchain]
+acton = "1.2.0"
+
+[contracts.Relay]
+src = "contracts/Relay.tolk"
+
+[contracts.m101]
+src = "contracts/m101.boc"
+
+[contracts.m102]
+src = "contracts/m102.boc"
+
+[contracts.m103]
+src = "contracts/m103.boc"
+
+[contracts.m105]
+src = "contracts/m105.boc"
+
+[contracts.StablecoinWalletTvm]
+src = "contracts/StablecoinWallet.boc"
+
+[fmt]
+width = 100
+
+[scripts]
+measure = "acton test tests/fees.test.tolk"
+
+[import-mappings]
+acton = ".acton"
+
+[contracts.Jetton2Wallet]
+src = "contracts/Jetton2Wallet.boc"
+types = "contracts/Jetton2Wallet.types.tolk"
+
+[contracts.JettonNotcoinWallet]
+src = "contracts/JettonNotcoinWallet.boc"
+types = "contracts/JettonNotcoinWallet.types.tolk"
+
+[contracts.JettonWallet]
+src = "contracts/JettonWallet.boc"
+types = "contracts/JettonWallet.types.tolk"
+
+[contracts.StablecoinWallet]
+src = "contracts/StablecoinWallet.boc"
+types = "contracts/StablecoinWallet.types.tolk"
+
+[contracts.minter]
+src = "contracts/minter.boc"
+
+[contracts.v100]
+src = "contracts/v100.boc"
+
+[contracts.v101]
+src = "contracts/v101.boc"
+
+[contracts.v102]
+src = "contracts/v102.boc"
+
+[contracts.v103]
+src = "contracts/v103.boc"
+
+[contracts.v105]
+src = "contracts/v105.boc"
+
+[contracts.v107]
+src = "contracts/v107.boc"

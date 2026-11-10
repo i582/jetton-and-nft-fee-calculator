@@ -1,0 +1,9 @@
+{
+  "address": "EQAmJs8wtwK93thF78iD76RQKf9Z3v2sxM57iwpZZtdQAiVM",
+  "observedAt": "2026-11-10T05:21:01.747Z",
+  "deployedCodeHash": "89468f02c78e570802e39979c8516fc38df07ea76a48357e0536f2ba7b3ee37b",
+  "resolvedCodeHash": "8f452d7a4dfd74066b682365177259ed05734435be76b5fd4bd5d8af2b7c3d68",
+  "isLibraryReference": true,
+  "source": "https://toncenter.com/api/v2/getAddressInformation",
+  "note": "Public catalog wallet; code verification only, not a forked transfer"
+}
