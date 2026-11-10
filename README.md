@@ -3,10 +3,10 @@
 This study measures the smallest attachment that completes an ordinary jetton or NFT ownership transfer.
 Acton executes original contract bytecode. TypeScript calculators reproduce the measured funding boundaries.
 
-Modern wallet BoCs and ABI interfaces come from the public [TON ABI catalog](https://github.com/ton-blockchain/abis/tree/7dc57067d85c95dc25c09ccaaf108eaba62f6303/data/jettons).
+Modern jetton-wallet and NFT item BoCs and ABI interfaces come from the public [TON ABI catalog](https://github.com/ton-blockchain/abis/tree/7dc57067d85c95dc25c09ccaaf108eaba62f6303/data).
 
 The [jetton report](JETTON_RESULTS.md) and [NFT report](NFT_RESULTS.md) contain the measured amounts.
-The [jetton measurements](results/jetton-measurements.json) and [NFT measurements](results/nft-measurements.json) include code hashes, gas usage, retained balances, excesses, and failure diagnostics.
+Both reports link to measurements with code hashes, gas usage, retained balances, excesses, and failure diagnostics.
 One GRAM equals 1,000,000,000 nanograms. All calculations use integers.
 
 ## Run the study
@@ -44,63 +44,98 @@ It requires no `NODE_PATH`. TypeScript scripts run directly through Bun.
 There is no single efficient attachment for all jetton-wallets.
 Modern wallets price gas and storage from network configuration. Older wallets enforce fixed GRAM amounts even when network prices decrease.
 
-At mainnet block 104490013 (2026-11-10), an empty USDT transfer needs **0.001426106 GRAM** with the precompiled contract enabled.
-The proposed attachment is **0.0016 GRAM**, after successful emulation.
+The following amounts use mainnet block **104490013**, recorded on **2026-11-10**. All table amounts use GRAM.
+The sender's jetton-wallet starts with 0.01 GRAM. The recipient's jetton-wallet does not exist.
+Each request transfers 1,000,000 jetton base units, forwards one nanogram, and requests a refund to the sender.
+The request contains no comment or custom payload.
 
-Jetton 1.2 needs **0.002659439 GRAM**. Jetton 2.0 needs **0.002578373 GRAM**.
-Jetton 1.07 still requires **0.040236272 GRAM** because of its fixed funding check.
-These amounts apply to the exact message and state described in the report.
+| Implementation | Minimum attachment | Suggested attachment | Transfer network cost |
+|---|---:|---:|---:|
+| Stablecoin / USDT | 0.001426106 | 0.001600000 | 0.000424938 |
+| Jetton 1.2 / NOT | 0.002659439 | 0.002800000 | 0.001618138 |
+| Jetton 2.0 | 0.002578373 | 0.002800000 | 0.001577071 |
+| Acton Tolk 2.1 | 0.002202839 | 0.002400000 | 0.001600271 |
+| Jetton 1.07 | 0.040236272 | 0.040400000 | 0.002105738 |
+
+Network costs correspond to the minimum attachment. They exclude the owner's transaction and execution at notification and refund destinations.
+USDT uses the precompiled contract entry in the recorded configuration.
+Jetton 1.07 requires a much larger attachment because its funding check uses fixed GRAM amounts.
+The [jetton report](JETTON_RESULTS.md) includes all 15 fixtures, retained balances, and refunds.
 
 The USDT library-reference hash matches a public deployed wallet.
 [usdt-code-check.json](fixtures/usdt-code-check.json) records that check.
 The transfer scenarios use synthetic accounts, not that holder's state.
 
-## NFT ownership transfers
+## NFT transfer budgets
 
-NFT transfers change the owner of an existing item contract. They do not deploy a recipient jetton-wallet.
-The calculator covers four bytecode implementations from the public TON ABI catalog:
-standard v1.03, editable v1.02/v1.03, Getgems V2, and Getgems editable V2.
-The catalog's NFT 1 and NFT 2.0 item fixtures have identical code hashes and share the same measurements.
+An NFT transfer changes the owner of an existing item contract.
+Its current GRAM balance helps satisfy the contract's reserve check.
 
-At the recorded block, all four need a suggested **0.0007 GRAM** when the NFT already holds 0.05 GRAM.
-This assumes one forwarded nanogram, a refund address, and no comment.
-After a previous transfer has spent part of that reserve, the standard item needs **0.0009 GRAM** under the same policy.
-An NFT with no GRAM needs **0.0504 GRAM** under the same policy. Most of that value stays on the NFT.
+These amounts use the same mainnet block as the jetton table. All table amounts use GRAM.
+Each initialized NFT starts with 0.05 GRAM. Each request forwards one nanogram and requests a refund to the current owner.
+The request contains no comment or custom payload. The new owner is uninitialized.
 
-The [NFT report](NFT_RESULTS.md) explains the balance-dependent formula and the wallet integration algorithm.
-Use `minimumNftAttachment()` from `nft-calculator.ts` for the four supported code hashes, followed by full-trace emulation.
-The 36 Acton scenarios cover initial balances, notifications, refunds, and a referenced comment.
-They verify ownership changes, outgoing messages, exact failure boundaries, and proposed attachment values.
+| Implementation | Minimum attachment | Suggested attachment | Transfer network cost |
+|---|---:|---:|---:|
+| Standard v1.03 | 0.000582201 | 0.000700000 | 0.000746469 |
+| Editable v1.02/v1.03 | 0.000583068 | 0.000700000 | 0.000747336 |
+| Getgems V2 | 0.000573734 | 0.000700000 | 0.000738002 |
+| Getgems editable V2 | 0.000581868 | 0.000700000 | 0.000746136 |
 
-Sales, auctions, minting, editorship transfers, DNS, TeleMint, Telegram gifts, and custom NFT forks are outside this study.
+Network costs correspond to the minimum attachment. They exclude the owner's transaction and execution at notification and refund destinations.
+Network cost can exceed the attachment because the NFT pays some costs from its existing balance.
+The [NFT report](NFT_RESULTS.md) includes retained balances, refunds, and message options.
 
-## Jetton attachment and transaction cost
+### Effect of the NFT balance
+
+For the standard v1.03 item, the same request produces these results:
+
+| Initial NFT balance | Minimum attachment | Suggested attachment | NFT balance after | Excess message value |
+|---|---:|---:|---:|---:|
+| 0.000000000 | 0.050232539 | 0.050400000 | 0.049486069 | 0.000000000 |
+| 0.010000000 | 0.040232539 | 0.040400000 | 0.049486069 | 0.000000000 |
+| 0.049486069 | 0.000746470 | 0.000900000 | 0.049486069 | 0.000000000 |
+| 0.050000000 | 0.000582201 | 0.000700000 | 0.049486069 | 0.000349662 |
+| 0.100000000 | 0.000582201 | 0.000700000 | 0.049486069 | 0.050349662 |
+
+Balances and refunds correspond to the minimum attachment. Network cost is **0.000746469 GRAM** in every row.
+The 0.049486069 GRAM initial balance is the amount left by a preceding transfer.
+An empty NFT needs about 0.05 GRAM of funding, but most of that value stays on the NFT.
+A refund can also include funds that the NFT held before the transfer.
+
+## Attachment and transaction cost
 
 An attachment is a temporary transfer budget. It includes network costs, forwarded value, storage funding, and possible excesses.
 It is not the transaction fee.
 
-The report separates these quantities:
+Both measurement files separate these quantities:
 
-- `minimum`: value attached to the sender's jetton-wallet.
-- `pathNetworkCost`: costs within the two jetton-wallets, including their outgoing forwarding fees.
-- `excessMessageValue`: value in the emitted refund message, before execution at its destination.
-- `senderBalanceAfter` and `receiverBalanceAfter`: GRAM retained by the jetton-wallets.
-- `jettonTransactionFees`: the sum of transaction `totalFees` for the two jetton-wallets.
+| Quantity | Jetton measurements | NFT measurements |
+|---|---|---|
+| Attached value | `minimum`, sent to the sender's jetton-wallet | `minimum`, sent to the NFT item |
+| Budget with margin | `suggested` | `suggested` |
+| Transfer network cost | `pathNetworkCost`, across both jetton-wallets | `pathNetworkCost`, within the NFT item |
+| Refund before destination execution | `excessMessageValue` | `excessMessageValue` |
+| Retained GRAM | `senderBalanceAfter`, `receiverBalanceAfter` | `balanceAfter` |
+| Transaction `totalFees` | `jettonTransactionFees`, summed across both jetton-wallets | `transactionFees`, for the NFT item |
 
 `totalFees` alone misses forwarding fees still carried by outgoing messages.
-The report also calculates network cost from conservation of value:
+Both reports calculate network cost from conservation of value:
 
 ```text
 pathNetworkCost = attached - excessMessageValue - forward_ton_amount
-                  - changeInSenderGramBalance - changeInReceiverGramBalance
+                  - changeInContractGramBalances
 ```
 
+For jettons, the balance change includes both jetton-wallets. For NFTs, it includes the item contract.
 The source owner's transaction and execution at refund/notification destinations are outside this metric.
 A wallet must estimate those costs separately for its actual wallet contract and batch.
 
 Old wallets retain much more than their nominal 0.01 GRAM storage reserve.
 For a new recipient, version 1.07 retains about **0.02493 GRAM** in this experiment.
 That retained balance is not a validator fee. It is also not an immediate refund to the user.
+NFTs can spend part of their existing balance or return it to the sender.
+Their attachment, retained balance, and refund must remain separate in the wallet UI.
 
 ## Covered jetton versions
 
@@ -112,12 +147,12 @@ Wallet code hashes, rather than marketing names or getter interfaces, identify t
 | 1.00 | `v100` | Original code, two forwarding fees even when forward value is zero |
 | 1.01 | `v101` | Revised transfer and excess calculation |
 | 1.02 | `v102` | Non-bounceable owner notification |
-| 1.03 and 1.04 | `v103` | Required Either bit; 1.04 changes the minter |
-| 1.05 and 1.06 | `v105` | Improved forward-fee estimate; 1.06 changes the minter |
+| 1.03 and 1.04 | `v103` | Required Either bit. Version 1.04 changes the minter |
+| 1.05 and 1.06 | `v105` | Improved forward-fee estimate. Version 1.06 changes the minter |
 | 1.07 | `v107` | Fixed gas allowance increases from 0.01 to 0.015 GRAM per wallet |
 | 1.01M | `m101` | Original minter.ton.org source |
 | 1.02M | `m102` | Original minter.ton.org source |
-| 1.03M and 1.04M | `m103` | Same transfer implementation; minter discovery changes separately |
+| 1.03M and 1.04M | `m103` | Same transfer implementation. Minter discovery changes separately |
 | 1.05M | `m105`, `minter` | Release source and later upstream revision |
 | Stablecoin 1.04 / USDT | `StablecoinWallet` | Library deployment with the block's ConfigParam 45 entry |
 | Jetton 1.2 / NOT | `JettonNotcoinWallet` | Library deployment |
@@ -128,21 +163,40 @@ Mintless claims, swaps, burns, governance operations, and custom wallet forks ar
 Mintless is a separate implementation family in the version history.
 The Acton 2.1 row is an additional implementation, not a historical FunC release.
 
-## Jetton measurement method
+## Covered NFT versions
+
+The mapping uses the pinned [NFT catalog](https://github.com/ton-blockchain/abis/tree/7dc57067d85c95dc25c09ccaaf108eaba62f6303/data/nfts).
+The calculator selects each implementation by its exact code hash.
+[nft-sources.json](fixtures/nft-sources.json) records those hashes and public download URLs.
+
+| Version | Fixture | Treatment |
+|---|---|---|
+| Standard v1.03 | `NftV1Item` | Initialized item, ownership transfer |
+| Editable v1.02/v1.03 | `NftV1EditableItem` | Ownership changes, editor and content remain unchanged |
+| Getgems V2 | `GetgemsNftItemV2` | Initialized item, ownership transfer |
+| Getgems editable V2 | `GetgemsNftEditableItemV2` | Ownership changes, editor and content remain unchanged |
+
+The catalog's NFT 1 and NFT 2.0 item fixtures have identical bytecode. Each unique implementation has one set of measurements.
+This coverage does not include every historical NFT release or simple-schema variant.
+Sales, auctions, minting, editorship transfers, DNS, TeleMint, Telegram gifts, and custom NFT forks are outside this study.
+
+## Measurement method
 
 The study uses mainnet prices from one pinned masterchain block.
 [config-provenance.json](fixtures/config-provenance.json) records the block, fetch time, and BoC checksum.
 The emulated accounts have no storage debt. Their `last_paid` equals the fixed emulation time.
 
+The relay emits a real internal message through its action phase.
+This supplies the actual incoming `forward_fee` that each contract reads.
+The relay's driver message funds its execution and stays outside the measured attachment.
+
+### Jetton scenarios
+
 Each sender starts with 1,000,000,000,000 jetton base units and sends 1,000,000 base units.
 Its address derives from zero-balance initial data. The populated balance only changes its current storage.
 The receiving owner is uninitialized. The response address is the funded sender relay.
 
-The relay emits a real internal message through its action phase.
-This supplies the actual incoming `forward_fee` that the jetton contract reads.
-The relay's driver message funds its execution and stays outside the measured attachment.
-
-Each implementation has five scenarios:
+Each of the 15 fixtures has five scenarios:
 
 - A new recipient wallet, one forwarded nanogram, and an empty payload.
 - An existing recipient wallet with 0.01 GRAM, with the same transfer.
@@ -152,18 +206,45 @@ Each implementation has five scenarios:
 
 This gives 75 scenarios on the recorded mainnet configuration.
 
+### NFT scenarios
+
+Each NFT is initialized with an owner and short metadata. Editable items also have an editor.
+Its address derives from the item index, collection address, and code. Current ownership and GRAM balance do not enter address derivation.
+The new owner is uninitialized. The current owner's funded relay receives refunds, except in scenarios without a response address.
+
+Each of the four fixtures has nine scenarios:
+
+| Scenario | Initial NFT balance | Forwarded value | Comment bytes | Refund requested |
+|---|---|---|---:|---|
+| Empty balance | 0 GRAM | 1 nanogram | 0 | Yes |
+| Low balance | 0.01 GRAM | 1 nanogram | 0 | Yes |
+| Nominal reserve | 0.05 GRAM | 1 nanogram | 0 | Yes |
+| Subsequent transfer | Balance left by the nominal-reserve scenario | 1 nanogram | 0 | Yes |
+| Surplus balance | 0.1 GRAM | 1 nanogram | 0 | Yes |
+| No notification | 0.05 GRAM | 0 nanograms | 0 | Yes |
+| Referenced comment | 0.05 GRAM | 1 nanogram | 32 | Yes |
+| No refund | 0.05 GRAM | 1 nanogram | 0 | No |
+| No outgoing messages | 0.05 GRAM | 0 nanograms | 0 | No |
+
+This gives 36 scenarios on the same mainnet configuration.
+
+### Success checks
+
 Each binary-search probe restores a complete world snapshot.
 A failed probe cannot fund a later probe or leave a recipient deployed.
-Success requires the expected balances at both jetton-wallets and notification emission when requested.
-The test drains all messages, including bounces and excesses.
+The tests process all messages, including bounces and excesses.
 
-The notification carries one nanogram. Its destination can skip computation without invalidating the jetton transfer.
-The test requires notification emission, not successful execution of arbitrary recipient code.
+For jettons, success requires the expected balances at both jetton-wallets and emission of the requested notification.
+For NFTs, success requires a committed owner change and a successful action phase.
+The NFT checks also require the requested notification and refund, unchanged content, and an unchanged editor for editable items.
+
+Notifications carry one nanogram. Their destinations can skip computation without invalidating either transfer.
+The tests require notification emission, not successful execution of arbitrary recipient code.
 
 The search resolves the boundary to one nanogram and checks both neighboring amounts.
-The TypeScript formula independently matches all measured boundaries.
+The TypeScript calculators match all measured boundaries.
 Acton also checks that each suggested attachment completes the transfer.
-The complete result table is compared with [jetton-expected-results.json](fixtures/jetton-expected-results.json).
+The complete results must match [jetton-expected-results.json](fixtures/jetton-expected-results.json) and [nft-expected-results.json](fixtures/nft-expected-results.json).
 
 ## Jetton funding formulas
 
@@ -198,24 +279,73 @@ Every strict comparison adds one nanogram to the calculated right-hand side.
 The shared `fees.ts` module provides network pricing, `incomingForwardFee()`, and `suggestedAttachment()` for both calculators.
 `incomingForwardFee()` calculates the remaining forwarding fee from the exact serialized internal message.
 
-## Jetton wallet integration algorithm
+## NFT funding formula
 
-- Read sender code, recipient state, library availability, and network configuration from a consistent block.
-- Match the deployed code and resolved library hash against a supported profile.
-- Build the exact TEP-74 request with its real amount, response address, forward value, and payload.
+For the four supported NFT code hashes, the calculator uses:
+
+```text
+forward_count = (forward_ton_amount > 0 ? 1 : 0)
+                + (response_destination exists ? 1 : 0)
+estimated_forward_fee = floor(incoming_forward_fee * 3 / 2)
+reserve_bound = 50,000,000 - NFT_balance + forward_ton_amount
+                + forward_count * estimated_forward_fee
+attachment = max(compute_fee(transfer_gas), reserve_bound)
+```
+
+All amounts in this formula use nanograms. `NFT_balance` is the balance after storage collection.
+The reserve check accepts equality. It does not need the extra nanogram used for strict jetton funding checks.
+
+Existing funds satisfy the reserve check, but they do not increase the incoming message's initial gas limit.
+The attachment must satisfy both bounds. The calculator takes their maximum rather than their sum.
+
+Gas usage depends on the implementation and the requested outgoing messages.
+The following gas units come from successful Acton traces:
+
+| Fixture | No messages | Refund only | Notification only | Both messages |
+|---|---:|---:|---:|---:|
+| `NftV1Item` | 4759 | 6800 | 6692 | 8733 |
+| `NftV1EditableItem` | 4972 | 6913 | 6805 | 8746 |
+| `GetgemsNftItemV2` | 4832 | 6773 | 6665 | 8606 |
+| `GetgemsNftEditableItemV2` | 4954 | 6895 | 6787 | 8728 |
+
+`minimumNftAttachment()` in `nft-calculator.ts` combines these gas profiles with the configuration prices and reserve check.
+Its result matches all 36 measured boundaries. The gas profiles cover the recorded initialized items and message layouts.
+Other code, custom payloads, storage debt, or future precompiled NFT implementations require a new full-trace estimate.
+
+## Wallet integration algorithm
+
+- Read contract code, account state, and network configuration from one consistent block.
+- Match the deployed code against a supported profile. For library deployments, also check the resolved library hash and availability.
+- Build the exact TEP-74 jetton request or TEP-62 NFT request.
 - Calculate the inbound forwarding fee from the actual owner-wallet message serialization.
-- Calculate the sender's funding threshold with `minimumJettonAttachment()`.
+- Calculate the candidate attachment with the corresponding function below.
+- If the attachment changes the message serialization, recalculate the forwarding fee and candidate.
 - Emulate the complete transfer against actual account state, including deployment and bounces.
 - If the trace fails because of funding, increase the budget and repeat from the original state.
 - If the trace fails because of a lock, authorization, balance, or invalid payload, report that error instead.
 - Find the smallest successful attachment, then apply `suggestedAttachment()` and emulate that final amount.
+
+| Transfer | Calculator | Required success checks |
+|---|---|---|
+| Jetton | `minimumJettonAttachment()` in `jetton-calculator.ts` | Expected balances at both jetton-wallets and requested notification |
+| NFT | `minimumNftAttachment()` in `nft-calculator.ts` | Committed owner change, successful action phase, requested notification and refund |
+
+For NFTs, also check that the item is initialized and the sender is its current owner.
+Use the actual NFT balance after storage collection.
 
 Unknown code, frozen accounts, storage debt, unavailable libraries, custom payloads, and unusual recipients require a full trace estimate.
 Successful execution at the sender alone is insufficient.
 The fixed table is a reference for these fixtures, not a replacement for emulation with actual account state.
 
 The proposed margin adds the larger of 0.0001 GRAM and 5% of the variable budget.
-It rounds upward to 0.0001 GRAM. Legacy fixed GRAM allowances do not receive a percentage markup.
+It rounds upward to 0.0001 GRAM. The `fixedFloor` argument excludes fixed funding from the percentage calculation:
+
+| Transfer | `fixedFloor` for `suggestedAttachment()` |
+|---|---|
+| Modern jetton-wallet | `0` |
+| Legacy jetton-wallet | `2 * fixed_gas_allowance + 10,000,000` nanograms |
+| NFT item | `max(0, 50,000,000 - NFT_balance)` nanograms |
+
 The margin is a product policy. It does not cover an arbitrary network price increase.
 
 For wallet UI, show the predicted network cost separately from the required attachment.
